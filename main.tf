@@ -71,11 +71,27 @@ resource "aws_iam_role_policy" "allows-s3-interaction" {
     Statement = [
       {
         Action = [
-          "s3:ListAllMyBuckets"
+          "s3:GetObject"
         ]
         Effect   = "Allow"
-        Resource = "*"
+        Resource = aws_s3_object.jar-archive.arn
       },
     ]
   })
+}
+
+resource "aws_s3_bucket" "jar-staging" {
+  
+}
+
+variable "path-to-jar" {
+  default = "build/libs/g-hello-0.0.1-SNAPSHOT.jar"
+}
+
+resource "aws_s3_object" "jar-archive" {
+  bucket = aws_s3_bucket.jar-staging.bucket
+  key = "g-hello.jar"
+  source = var.path-to-jar
+
+  source_hash = filemd5(var.path-to-jar)
 }
