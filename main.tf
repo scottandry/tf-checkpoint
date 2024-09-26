@@ -36,6 +36,15 @@ resource "aws_vpc_security_group_ingress_rule" "allow-ssh" {
   cidr_ipv4   = "0.0.0.0/0"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow-spring-boot" {
+  security_group_id = aws_security_group.allow-ssh.id
+
+  ip_protocol = "tcp"
+  from_port   = 8080
+  to_port     = 8080
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_egress_rule" "allow-all-traffic-outbound" {
   security_group_id = aws_security_group.allow-ssh.id
 
