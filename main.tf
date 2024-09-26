@@ -15,20 +15,28 @@ resource "aws_instance" "spring-boot-server" {
   instance_type        = "t2.micro"
   ami                  = "ami-033067239f2d2bfbc"
   key_name             = "dh-sa-04-us-west-2"
-  security_groups      = [aws_security_group.allow-ssh.name]
+  security_groups      = [aws_security_group.allow-ssh-spring-boot.name]
   iam_instance_profile = aws_iam_instance_profile.allows-s3-interaction.name
+  user_data = templatefile("install-launch-spring-boot.tftpl", {
+    name_bucket = aws_s3_bucket.jar-staging.bucket
+    name_file = aws_s3_object.jar-archive.key
+  })
+  user_data_replace_on_change = true
+  
+  # lifecycle {
+  #   replace_triggered_by = [ aws_s3_object.jar-archive.etag ]
+  # }
 
   tags = {
     "Name" = "dennis-tf-checkpoint-server"
   }
 }
 
-resource "aws_security_group" "allow-ssh" {
-
+resource "aws_security_group" "allow-ssh-spring-boot" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow-ssh" {
-  security_group_id = aws_security_group.allow-ssh.id
+  security_group_id = aws_security_group.allow-ssh-spring-boot.id
 
   ip_protocol = "tcp"
   from_port   = 22
@@ -37,7 +45,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow-ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow-spring-boot" {
-  security_group_id = aws_security_group.allow-ssh.id
+  security_group_id = aws_security_group.allow-ssh-spring-boot.id
 
   ip_protocol = "tcp"
   from_port   = 8080
@@ -46,7 +54,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow-spring-boot" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow-all-traffic-outbound" {
-  security_group_id = aws_security_group.allow-ssh.id
+  security_group_id = aws_security_group.allow-ssh-spring-boot.id
 
   ip_protocol = "-1"
   cidr_ipv4   = "0.0.0.0/0"
@@ -90,7 +98,6 @@ resource "aws_iam_role_policy" "allows-s3-interaction" {
 }
 
 resource "aws_s3_bucket" "jar-staging" {
-  
 }
 
 variable "path-to-jar" {

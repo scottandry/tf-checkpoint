@@ -1,0 +1,5 @@
+#!/bin/bash
+yum update -y
+yum install -y java-17-amazon-corretto-headless
+aws s3api get-object --bucket ${name_bucket} --key ${name_file} ${name_file}
+java -jar ${name_file}
