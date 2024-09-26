@@ -34,3 +34,10 @@ resource "aws_vpc_security_group_ingress_rule" "allow-ssh" {
   to_port = 22
   cidr_ipv4 = "0.0.0.0/0"
 }
+
+resource "aws_vpc_security_group_egress_rule" "allow-all-traffic-outbound" {
+  security_group_id = aws_security_group.allow-ssh.id
+
+  ip_protocol = "-1"
+  cidr_ipv4 = "0.0.0.0/0"
+}
