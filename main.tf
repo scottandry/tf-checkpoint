@@ -16,6 +16,7 @@ resource "aws_instance" "spring-boot-server" {
   ami = "ami-033067239f2d2bfbc"
   key_name = "dh-sa-04-us-west-2"
   security_groups = [ aws_security_group.allow-ssh.name ]
+  iam_instance_profile = aws_iam_instance_profile.allows-s3-interaction.name
 
   tags = {
     "Name" = "dennis-tf-checkpoint-server"
@@ -40,4 +41,8 @@ resource "aws_vpc_security_group_egress_rule" "allow-all-traffic-outbound" {
 
   ip_protocol = "-1"
   cidr_ipv4 = "0.0.0.0/0"
+}
+
+resource "aws_iam_instance_profile" "allows-s3-interaction" {
+  
 }
