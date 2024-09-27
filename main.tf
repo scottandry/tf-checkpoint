@@ -15,16 +15,16 @@ resource "aws_instance" "spring-boot-server" {
   instance_type        = "t2.micro"
   ami                  = "ami-033067239f2d2bfbc"
   key_name             = "dh-sa-04-us-west-2"
-  security_groups      = [aws_security_group.allow-ssh-spring-boot.name]
+  security_groups = [aws_security_group.allow-ssh-spring-boot.name]
   iam_instance_profile = aws_iam_instance_profile.allows-s3-interaction.name
   user_data = templatefile("install-launch-spring-boot.tftpl", {
     name_bucket = aws_s3_bucket.jar-staging.bucket
-    name_file = aws_s3_object.jar-archive.key
+    name_file   = aws_s3_object.jar-archive.key
   })
   user_data_replace_on_change = true
-  
+
   # lifecycle {
-  #   replace_triggered_by = [ aws_s3_object.jar-archive.etag ]
+  #   replace_triggered_by = [ aws_s3_object.jar-archive.source_hash ]
   # }
 
   tags = {
@@ -106,7 +106,7 @@ variable "path-to-jar" {
 
 resource "aws_s3_object" "jar-archive" {
   bucket = aws_s3_bucket.jar-staging.bucket
-  key = "g-hello.jar"
+  key    = "g-hello.jar"
   source = var.path-to-jar
 
   source_hash = filemd5(var.path-to-jar)
